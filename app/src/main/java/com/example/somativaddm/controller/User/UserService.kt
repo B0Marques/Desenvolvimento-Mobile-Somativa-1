@@ -21,9 +21,9 @@ class UserService(private val db: UserDatabase, context: Context):ViewModel() {
     }
     fun insertUser(username:String, password:String){
         viewModelScope.launch (Dispatchers.IO){
-            val userToInsert = UserDTO(id = 1,nickname = username, password = password)
+            val userToInsert = UserDTO( repository.countUsers() + 1 ,nickname = username, password = password)
             repository.insertUser(userToInsert)
-            Log.d("DEBUG","user inserted")
+            Log.d("DEBUG","User ${userToInsert.nickname}, inserted. ID: ${userToInsert.id}")
 
         }
 

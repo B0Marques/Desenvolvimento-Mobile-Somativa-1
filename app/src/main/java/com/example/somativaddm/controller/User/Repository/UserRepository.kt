@@ -18,5 +18,7 @@ interface UserRepository {
     @Insert (onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(userDTO: UserDTO)
 
+    @Query("SELECT COUNT (*) FROM UserDTO")
+    suspend fun countUsers():Long
 
 }
