@@ -21,11 +21,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
@@ -58,11 +60,24 @@ class LoginActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth())
                     PasswordField(value = "password", onChange = {},
                         modifier = Modifier.fillMaxWidth())
+
+                    Button(onClick = {
+
+                    },
+                        shape= RoundedCornerShape(5.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Login")
+                    }
                 }
             }
         }
          
     }
+}
+
+fun checkLogin(){
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
