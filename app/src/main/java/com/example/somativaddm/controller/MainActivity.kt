@@ -1,5 +1,6 @@
 package com.example.somativaddm.controller
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -17,5 +18,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.mainRecyclerView.layoutManager =
             GridLayoutManager(this, 2)
+
+        val intent = Intent(this, LoginActivity::class.java)
+
+        startActivity(intent)
     }
 }
