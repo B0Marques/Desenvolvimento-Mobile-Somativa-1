@@ -49,7 +49,6 @@ import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
-import com.example.somativaddm.controller.User.Repository.UserDatabase
 import com.example.somativaddm.controller.User.UserDTO
 import com.example.somativaddm.controller.User.UserService
 import com.example.somativaddm.controller.viewmodel.MainViewModel
@@ -142,30 +141,6 @@ fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
         }
     }
     return false
-}
-class makeLogin:ViewModel(){
-
-    public suspend fun checkLogin(username:String, userPassword:String, service: UserService){
-        withContext(Dispatchers.IO) {
-            val user: UserDTO? = service.findByUserName(username)
-            if (user != null) {
-                Log.d("DEBUG", "FIND USER")
-                if (user.password == userPassword) {
-                    Log.d("DEBUG", "Welcome, ${username}")
-
-                } else {
-                    Log.d("DEBUG", "Wrong password")
-                }
-
-            } else {
-
-                Log.d("DEBUG", "CANT FIND USER")
-
-            }
-
-        }
-
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
