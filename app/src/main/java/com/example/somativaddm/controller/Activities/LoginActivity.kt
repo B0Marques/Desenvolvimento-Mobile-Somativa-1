@@ -44,25 +44,58 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.example.somativaddm.controller.AppModule
+import com.example.somativaddm.controller.Game.Category
+import com.example.somativaddm.controller.Game.Game
+import com.example.somativaddm.controller.Game.GameRepository
+import com.example.somativaddm.controller.Game.GameViewModel
+import com.example.somativaddm.controller.Game.Platform
+import com.example.somativaddm.controller.Game.RetrofitInstance
 import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
 import com.example.somativaddm.controller.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
     val viewModel: MainViewModel by viewModels()
-    @Inject lateinit var repository: UserRepository
+
+    val userViewModel: MainViewModel by viewModels()
+    val gameViewModel: GameViewModel by viewModels()
+    @Inject lateinit var gameRepository: GameRepository
+    @Inject lateinit var userRepository: UserRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.refresh()
-        val users = repository.dao.getAll()
+        val users = userRepository.users
         users.forEach{
             val text = "User: ${it.userName}, password: ${it.password}"
             Log.d("Users", text)
         }
+        userViewModel.refresh()
+        //gameViewModel.refresh()
+
+        userRepository = AppModule().provideRepository(
+            AppModule().provideDao(AppModule().provideDatabase(applicationContext))
+        )
+        gameRepository = AppModule().provideGameRepository(AppModule().providesGameDatabase(applicationContext))
+
+        val genre = Category(1,"DebugGenre")
+        gameViewModel.insertCategory(genre)
+
+        gameViewModel.refresh()
+
+
+
         setContent{
             Surface {
                 var login = remember {
@@ -75,9 +108,47 @@ class LoginActivity : ComponentActivity() {
                 //val service = UserService(db,context)
 
                 val coroutineScope = rememberCoroutineScope()
-                repository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
-                repository.add(User(1,"Clebinho","1234"))
+                userRepository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
+                userRepository.add(User(1,"Clebinho","1234"))
 
+                coroutineScope.launch {
+                    val genres = gameRepository.getAllCategories()
+                    val platforms = gameRepository.getAllPlatforms()
+                    if(genres.isEmpty()){
+                        Log.d("CategoryDEBUG", "No Genre yet")
+                    }else{
+                        genres.forEach{
+                            Log.d("CategoryDEBUG","Genre ${it.name}, ID: ${it.id}")
+                        }
+                    }
+
+                    platforms.forEach{
+                        Log.d("PlatformDebug", "Platform ${it.name}, ID: ${it.id}")
+                    }
+
+                    val gameTest = gameRepository.getGameByID(540)
+
+                    val gameToAdd = gameRepository.insertGame(
+                        id = 1,
+                        title = "Debug Game",
+                        thumb = "game.png",
+                        shortDescription = "Game only to debug",
+                        gameURL = "game.url.com",
+                        developer = "Vapor Company",
+                        releaseDate = "11/04/2024",
+                        platformName = "PC",
+                        genreName = "DebugGenre"
+                    )
+                    if(gameToAdd != null) {
+                        Log.d("GameDebug", "Game Inserted: ${gameToAdd.id}: ${gameToAdd.title}")
+                        gameViewModel.refresh()
+                    }
+
+                    val games = gameRepository.getAllGames()
+                    games.forEach{
+                        Log.d("GameDebug","Game ${it.id}: ${it.title}")
+                    }
+                }
 
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -94,7 +165,7 @@ class LoginActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            if(Login(login.value,password.value,repository)){
+                            if(Login(login.value,password.value,userRepository)){
                                 Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
                             }
                             else{
@@ -123,6 +194,31 @@ class LoginActivity : ComponentActivity() {
             }
         }
          
+    }
+
+
+    suspend fun addGame(
+        id:Int,
+        title:String,
+        thumb:String,
+        shortDescription:String,
+        gameURL: String,
+        developer:String,
+        releaseDate:String,
+        platform:String,
+        genre:String,
+        repository: GameRepository,
+        coroutineScope: CoroutineScope
+    ):Deferred<Game?>{
+        return coroutineScope.async{
+
+            var game:Game? = null
+            var gameExists:Boolean = false
+
+
+
+            return@async game
+        }
     }
 }
 fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
@@ -184,4 +280,7 @@ fun LoginField(value:String, onChange: (String) -> Unit,
         visualTransformation = VisualTransformation.None
         )
 }
+
+
+
 
