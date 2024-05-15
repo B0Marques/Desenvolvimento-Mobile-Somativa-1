@@ -67,6 +67,11 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.refresh()
+        val users = repository.dao.getAll()
+        users.forEach{
+            val text = "User: ${it.userName}, password: ${it.password}"
+            Log.d("Users", text)
+        }
         setContent{
             Surface {
                 var login = remember {
@@ -104,20 +109,6 @@ class LoginActivity : ComponentActivity() {
                             else{
                                 Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
                             }
-
-                            /*
-                            coroutineScope.launch {
-                                withContext(Dispatchers.IO){
-                                    try{
-                                        //makeLogin().checkLogin(login.value,password.value,service)
-
-                                    }
-                                    catch (e:Exception){
-                                        Log.w("DEBUG", "LOGIN ERROR")
-                                    }
-                                }
-                            }
-                            */
                         }
                         else{
                             Toast.makeText(context,"One of the fields is blank", Toast.LENGTH_SHORT).show()
