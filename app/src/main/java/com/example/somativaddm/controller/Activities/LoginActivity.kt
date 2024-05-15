@@ -1,6 +1,5 @@
-package com.example.somativaddm.controller
+package com.example.somativaddm.controller.Activities
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -45,18 +44,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.room.Room
+import com.example.somativaddm.controller.AppModule
 import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
-import com.example.somativaddm.controller.User.UserDTO
-import com.example.somativaddm.controller.User.UserService
 import com.example.somativaddm.controller.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -119,7 +111,7 @@ class LoginActivity : ComponentActivity() {
                         Text("Login")
                     }
                     Button(onClick = {
-                        val intent = Intent(context,RegisterActivity::class.java)
+                        val intent = Intent(context, RegisterActivity::class.java)
                         startActivity(intent)
                     },
                         shape= RoundedCornerShape(5.dp),

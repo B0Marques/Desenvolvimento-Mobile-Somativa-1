@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.somativaddm.R
+import com.example.somativaddm.controller.Activities.LoginActivity
 import com.example.somativaddm.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

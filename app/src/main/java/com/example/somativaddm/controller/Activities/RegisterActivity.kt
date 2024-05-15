@@ -1,4 +1,4 @@
-package com.example.somativaddm.controller
+package com.example.somativaddm.controller.Activities
 
 import android.content.Context
 import android.content.Intent
@@ -7,8 +7,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,15 +43,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.somativaddm.R
+import com.example.somativaddm.controller.AppModule
 import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
 import com.example.somativaddm.controller.viewmodel.MainViewModel
-import com.example.somativaddm.databinding.ActivityRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -113,7 +106,7 @@ class RegisterActivity :  ComponentActivity() {
                         Button(
                             onClick = {
                                 if(CheckCredentials(login.value,password.value,confirmPassword.value,repository,context)){
-                                    val intent = Intent(context,LoginActivity::class.java)
+                                    val intent = Intent(context, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
 
