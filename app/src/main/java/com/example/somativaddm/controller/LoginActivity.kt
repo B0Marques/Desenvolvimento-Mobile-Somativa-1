@@ -1,6 +1,7 @@
 package com.example.somativaddm.controller
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -13,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,23 +47,28 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import com.example.somativaddm.controller.User.Model.User
+import com.example.somativaddm.controller.User.Model.UserRepository
 import com.example.somativaddm.controller.User.Repository.UserDatabase
 import com.example.somativaddm.controller.User.UserDTO
 import com.example.somativaddm.controller.User.UserService
+import com.example.somativaddm.controller.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
+    val viewModel: MainViewModel by viewModels()
+    @Inject lateinit var repository: UserRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val db = Room.databaseBuilder(
-            applicationContext,
-            UserDatabase::class.java, "database-user"
-        ).build()
+        viewModel.refresh()
         setContent{
             Surface {
-
                 var login = remember {
                     mutableStateOf("")
                 }
@@ -69,9 +76,12 @@ class LoginActivity : ComponentActivity() {
                     mutableStateOf("")
                 }
                 val context = LocalContext.current
-                val service = UserService(db,context)
+                //val service = UserService(db,context)
 
                 val coroutineScope = rememberCoroutineScope()
+                repository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
+                repository.add(User(1,"Clebinho","1234"))
+
 
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -88,17 +98,26 @@ class LoginActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            if(Login(login.value,password.value,repository)){
+                                Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
+                            }
+                            else{
+                                Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
+                            }
 
+                            /*
                             coroutineScope.launch {
                                 withContext(Dispatchers.IO){
                                     try{
-                                        makeLogin().checkLogin(login.value,password.value,service)
+                                        //makeLogin().checkLogin(login.value,password.value,service)
+
                                     }
                                     catch (e:Exception){
                                         Log.w("DEBUG", "LOGIN ERROR")
                                     }
                                 }
                             }
+                            */
                         }
                         else{
                             Toast.makeText(context,"One of the fields is blank", Toast.LENGTH_SHORT).show()
@@ -110,7 +129,8 @@ class LoginActivity : ComponentActivity() {
                         Text("Login")
                     }
                     Button(onClick = {
-                        service.insertUser("Clebinho","1234")
+                        val intent = Intent(context,RegisterActivity::class.java)
+                        startActivity(intent)
                     },
                         shape= RoundedCornerShape(5.dp),
                         modifier = Modifier.fillMaxWidth(0.5f)
@@ -123,7 +143,15 @@ class LoginActivity : ComponentActivity() {
          
     }
 }
-
+fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
+    val users = repository.dao.getByName(nickname)
+    users.forEach{
+        if(nickname == it.userName && password == it.password){
+             return true
+        }
+    }
+    return false
+}
 class makeLogin:ViewModel(){
 
     public suspend fun checkLogin(username:String, userPassword:String, service: UserService){
@@ -149,15 +177,10 @@ class makeLogin:ViewModel(){
     }
 }
 
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordField(value:String, onChange: (String) -> Unit,
-               modifier: Modifier = Modifier,
-              ){
+               modifier: Modifier = Modifier,){
 
 
     var passwordVisible by rememberSaveable {

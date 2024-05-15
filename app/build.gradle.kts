@@ -52,6 +52,8 @@ android {
 
 dependencies {
 
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     val hiltVersion = "2.50"
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")
@@ -123,5 +125,10 @@ dependencies {
 
     //Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+
+    //Inject
+    val dagger_version = "2.40"
+    implementation ("com.google.dagger:dagger:$dagger_version")
+    kapt ("com.google.dagger:dagger-compiler:$dagger_version")
 
 }
