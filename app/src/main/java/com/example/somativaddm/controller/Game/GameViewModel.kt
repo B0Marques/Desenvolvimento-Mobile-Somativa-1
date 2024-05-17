@@ -23,27 +23,8 @@ class GameViewModel @Inject constructor(
 
     }
 
-    fun insertPlatform(platform: Platform){
-        viewModelScope.launch (Dispatchers.IO){
-            repository.insertPlatform(platform)
-        }
-    }
-    fun insertCategory(category: Category){
-        viewModelScope.launch (Dispatchers.IO){
-            repository.insertCategory(category)
-        }
-    }
-    fun insertGamePlatformJoin(join: GamePlatformJoin) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.insertGamePlatformJoin(join)
-        }
-    }
 
-    fun insertGameCategoryJoin(join: GameCategoryJoin) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.insertGameCategoryJoin(join)
-        }
-    }
+
     fun refresh(){
         viewModelScope.launch (Dispatchers.IO){
             //allGamesLiveData.value = repository.getAllGames()

@@ -1,37 +1,45 @@
 package com.example.somativaddm.controller.Game
 
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.Response
 import org.json.JSONArray
+import org.json.JSONObject
 import javax.inject.Inject
 
 class GameRepository @Inject constructor(
-    private val gameDao: GameDAO,
-    private val PlatformDao:PlatformDAO,
-    private val categoryDAO: CategoryDAO,
-    private val gamePlatformJoinDAO: GamePlatformJoinDao,
-    private val gameCategoryJoinDAO: GameCategoryJoinDao) {
+    private val gameDao: GameDAO) {
 
-    //region Games
     var games = gameDao.getAll()
     var game:Game? = null
 
     suspend fun getAllGames():List<Game>{
         return gameDao.getAll()
     }
-    suspend fun getGameByID(ID:Int){
-        //extractGameValueFromJson(RetrofitInstance.gameAPI.getGameByID(ID))
+    suspend fun getGameByID(ID:Int):Game?{
+        games.forEach {
+            if(it.id == ID)
+                return it
+        }
+      return null
+    }
+    suspend fun createGamesDatabase(){
         try{
-            val response = RetrofitInstance.gameAPI.getGameByID(ID)
-            if(response.isSuccessful){
-                val json = response.body()?.string()
-
-                if (json!=null) {
-                    Log.d("JSON DEBUG",json)
-                    extractGameValueFromJson(json)
-                }
+            val response = RetrofitInstance.gameAPI.getAllGames()
+            if(response!=null){
+                val json = response.string()
+                parseMultipleGamesJson(json)
             }
+            else{
+                Log.e("API ERROR", "Empty response from API")
+            }
+
         }
         catch (e:Exception){
+            Log.e("API ERROR", "Error Fetching Games",e)
 
         }
     }
@@ -42,15 +50,29 @@ class GameRepository @Inject constructor(
     suspend fun insertGame(
         id:Int,
         title: String,
-        thumb: String,
-        shortDescription: String,
-        gameURL: String,
-        developer: String,
-        releaseDate: String,
-        platformName: String,
-        genreName: String
+        thumb: String?,
+        shortDescription: String?,
+        gameURL: String?,
+        developer: String?,
+        releaseDate: String?,
+        platformName: String?,
+        genreName: String?
     ):Game?{
         var gameExists = false
+
+        //region nullables
+        var short_description = shortDescription.isNullOrBlank().let { "Value empty in database" }
+        var _thumb = thumb.isNullOrBlank().let { "Value empty in database" }
+        var game_URL = gameURL.isNullOrBlank().let { "Value empty in database" }
+
+        var _developer = developer.isNullOrBlank().let { "Value empty in database" }
+
+        var release_Date = releaseDate.isNullOrBlank().let { "Value empty in database" }
+        var platform = platformName.isNullOrBlank().let { "Value empty in database" }
+        var genre = genreName.isNullOrBlank().let { "Value empty in database" }
+        //endregion
+
+
         //region check if the game already exist, if does returns null
 
         games.forEach {
@@ -58,54 +80,19 @@ class GameRepository @Inject constructor(
                 gameExists=true
             }
         }
-        //endregion
         if(!gameExists) {
 
-            //region check if genre exists if doenst, create a new
-            val genres = getAllCategories()
-            var genreToGame: Category? = null
-            genres.forEach {
-                if (it.name == genreName) {
-                    genreToGame = it
-                }
-            }
-            if (genreToGame == null) {
-                insertCategory(
-                    Category(
-                        getAllCategories().size + 1,
-                        genreName
-                    )
-                )
-            }
-            //endregion
-
-            //region check if platform exists, if doesnt, create a new
-            val platforms = getAllPlatforms()
-            var platformToGame: Platform? = null
-            platforms.forEach {
-                if (it.name == platformName)
-                    platformToGame = it
-            }
-            if (platformToGame == null) {
-                insertPlatform(
-                    Platform(
-                        getAllPlatforms().size + 1,
-                        platformName
-                    )
-                )
-            }
-            //endregion
 
             game = Game(
-                id,
-                title,
-                thumb,
-                shortDescription,
-                gameURL,
-                developer,
-                releaseDate,
-                getPlatformByName(platformName)!!,
-                getCategoryByName(genreName)!!
+                id = id,
+                title = title,
+                thumbURL = _thumb,
+                shortDescription = short_description,
+                gameURL = game_URL,
+                developer = _developer,
+                releaseDate = release_Date,
+                platform = platform,
+                genre = genre
             )
 
             gameDao.insert(game!!)
@@ -116,97 +103,62 @@ class GameRepository @Inject constructor(
         }
         return game
     }
-    //endregion
 
-    //region Platform
-    suspend fun getAllPlatforms():List<Platform>{
-        return PlatformDao.getAllPlatforms()
-    }
+    suspend fun insertGameByTemporary(temporaryGame: TemporaryGame){
+        var gameExists = false
 
-    suspend fun insertPlatform(platform: Platform){
-        if(getPlatformByName(platform.name)==null){
-            PlatformDao.insertPlatform(platform)
-        }
-        else{
-            Log.d("PlatformDebug","Platform ${platform.name} already exists")
-        }
+        //region nullables
+        var thumb = temporaryGame.thumbnail
+        if(thumb.isNullOrBlank()) thumb = "No Value"
 
-    }
-    suspend fun getPlatformByName(name: String): Platform? {
-        val plat = PlatformDao.getByName(name)
-        plat.forEach {
-            if(it.name == name)
-                return it
+        var short_description = temporaryGame.short_description
+        if(short_description.isNullOrBlank()) short_description = "No Value"
 
-        }
-        return null
-    }
+        //endregion
 
-    //endregion
 
-    //region Category or Genre
+        //region check if the game already exist, if does returns null
 
-    suspend fun getAllCategories():List<Category>{
-        return categoryDAO.getAllCategories()
-    }
-
-    suspend fun getCategoryByName(name:String): Category? {
-        val genre = categoryDAO.getByName(name)
-        genre.forEach {
-            if(it.name == name)
-                return it
-
-        }
-        return null
-    }
-
-    suspend fun insertCategory(category: Category){
-        if(getCategoryByName(category.name) == null ){
-            categoryDAO.insertCategory(category)
-        }
-        else{
-            Log.d("CategoryDEBUG","Category ${category.name} already exists")
-        }
-    }
-
-    //endregion
-
-    //region Joins
-    suspend fun insertGamePlatformJoin(join: GamePlatformJoin){
-        gamePlatformJoinDAO.insertGamePlatformJoin(join)
-    }
-
-    suspend fun insertGameCategoryJoin(join:GameCategoryJoin){
-        gameCategoryJoinDAO.insertGameCategoryJoin(join)
-    }
-
-    //endregion
-
-    suspend fun extractGameValueFromJson(json:String):Game{
-        val gameValues = mutableListOf<String>()
-        val gameTest:Game? = Game(
-            title = "Debug Game",
-            thumbURL = "game.png",
-            shortDescription = "Game only to debug",
-            gameURL = "game.url.com",
-            developer = "Vapor Company",
-            releaseDate = "11/04/2024",
-            Platform = getPlatformByName("PC")!!,
-            genre = getCategoryByName("DebugGenre")!!
-        )
-        try{
-            val jsonArray = JSONArray(json)
-            for(i in 0 until jsonArray.length()){
-                val jsonObject = jsonArray.getJSONObject(i)
-                val id = jsonObject.getInt("id")
-
-                gameTest!!.id = id
+        games.forEach {
+            if(it.id == temporaryGame.id) {
+                gameExists=true
             }
         }
-        catch(e:Exception){
-            Log.w("EXCEPTION DEBUG", e.message!!)
+        if(!gameExists) {
+
+
+            game = Game(
+                id = temporaryGame.id!!,
+                title = temporaryGame.title!!,
+                thumbURL = temporaryGame.thumbnail!!,
+                shortDescription = temporaryGame.short_description!!,
+                gameURL = temporaryGame.game_url!!,
+                developer = temporaryGame.developer!!,
+                releaseDate = temporaryGame.release_date!!,
+                platform = temporaryGame.platform!!,
+                genre = temporaryGame.genre!!
+            )
+
+            gameDao.insert(game!!)
+            Log.d("Insert Game","Game Inserted: ${game!!.id}, ${game!!.title}")
+            games=gameDao.getAll()
+
+        }else{
+            Log.d("GameDebug","Game Alreay Exist")
         }
-        return gameTest!!
+    }
+
+    suspend fun parseMultipleGamesJson(json:String){
+            try {
+                val gameListType = object : TypeToken<List<TemporaryGame>>() {}.type
+                val gameList: List<TemporaryGame> = Gson().fromJson(json, gameListType)
+                gameList.forEach { insertGameByTemporary(it)}
+
+
+            }
+            catch (e:Exception){
+                Log.e("Json Parsin Error", "Error parsing JSON",e)
+            }
     }
 
 

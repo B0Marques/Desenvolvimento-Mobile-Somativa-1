@@ -48,6 +48,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.somativaddm.controller.AppModule
 import com.example.somativaddm.controller.Game.Category
 import com.example.somativaddm.controller.Game.Game
+import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.GameViewModel
 import com.example.somativaddm.controller.Game.Platform
@@ -72,9 +73,12 @@ class LoginActivity : ComponentActivity() {
     val gameViewModel: GameViewModel by viewModels()
     @Inject lateinit var gameRepository: GameRepository
     @Inject lateinit var userRepository: UserRepository
+    @Inject lateinit var gameDatabase: GameDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         viewModel.refresh()
         val users = userRepository.users
         users.forEach{
@@ -89,10 +93,10 @@ class LoginActivity : ComponentActivity() {
         )
         gameRepository = AppModule().provideGameRepository(AppModule().providesGameDatabase(applicationContext))
 
-        val genre = Category(1,"DebugGenre")
-        gameViewModel.insertCategory(genre)
-
         gameViewModel.refresh()
+
+        gameDatabase = AppModule().providesGameDatabase(applicationContext)
+
 
 
 
@@ -108,46 +112,21 @@ class LoginActivity : ComponentActivity() {
                 //val service = UserService(db,context)
 
                 val coroutineScope = rememberCoroutineScope()
+
+
                 userRepository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
-                userRepository.add(User(1,"Clebinho","1234"))
+
 
                 coroutineScope.launch {
-                    val genres = gameRepository.getAllCategories()
-                    val platforms = gameRepository.getAllPlatforms()
-                    if(genres.isEmpty()){
-                        Log.d("CategoryDEBUG", "No Genre yet")
-                    }else{
-                        genres.forEach{
-                            Log.d("CategoryDEBUG","Genre ${it.name}, ID: ${it.id}")
-                        }
-                    }
+                    //val gameTest = gameRepository.getGameByID(999)
 
-                    platforms.forEach{
-                        Log.d("PlatformDebug", "Platform ${it.name}, ID: ${it.id}")
-                    }
-
-                    val gameTest = gameRepository.getGameByID(540)
-
-                    val gameToAdd = gameRepository.insertGame(
-                        id = 1,
-                        title = "Debug Game",
-                        thumb = "game.png",
-                        shortDescription = "Game only to debug",
-                        gameURL = "game.url.com",
-                        developer = "Vapor Company",
-                        releaseDate = "11/04/2024",
-                        platformName = "PC",
-                        genreName = "DebugGenre"
-                    )
-                    if(gameToAdd != null) {
-                        Log.d("GameDebug", "Game Inserted: ${gameToAdd.id}: ${gameToAdd.title}")
-                        gameViewModel.refresh()
-                    }
-
+                    gameRepository.createGamesDatabase()
+                    /*
                     val games = gameRepository.getAllGames()
                     games.forEach{
                         Log.d("GameDebug","Game ${it.id}: ${it.title}")
                     }
+                    */
                 }
 
                 Column(

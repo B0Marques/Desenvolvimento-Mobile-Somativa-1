@@ -23,7 +23,7 @@ object RetrofitInstance{
 }
 interface GameAPI {
     @GET("games")
-    suspend fun getAllGames():Game
+    suspend fun getAllGames():ResponseBody
 
     @GET("game")
     suspend fun getGameByID(@Query("id") id: Int):Response<ResponseBody>
