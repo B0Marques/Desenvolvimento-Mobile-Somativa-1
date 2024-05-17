@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.somativaddm.R
+import com.example.somativaddm.controller.Activities.AllGamesActivity
 import com.example.somativaddm.controller.Activities.LoginActivity
 import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
@@ -37,7 +38,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        val intent = Intent(this, LoginActivity::class.java)
+        //val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, AllGamesActivity::class.java)
         /*
         val db = AppModule().providesGameDatabase(applicationContext)
         db.clearAllTables()

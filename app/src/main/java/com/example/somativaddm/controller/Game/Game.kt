@@ -20,8 +20,6 @@ data class Game (
     var releaseDate:String,
     var platform:String,
     var genre:String
-
-
 )
 
 class TemporaryGame(
@@ -34,44 +32,4 @@ class TemporaryGame(
     var release_date:String?,
     var platform:String?,
     var genre:String?
-)
-
-@Entity(tableName = "platforms")
-data class Platform(
-    @PrimaryKey(autoGenerate = true)
-    val id:Int=0,
-    val name:String
-)
-
-@Entity(tableName = "categories")
-data class Category(
-    @PrimaryKey(autoGenerate = true)
-    val id:Int =0,
-    val name:String
-)
-
-@Entity(
-    tableName = "game_Platform_join",
-    primaryKeys = ["gameId","PlatformId"],
-    foreignKeys = [
-        ForeignKey(entity = Game::class, parentColumns = ["id"], childColumns = ["gameId"]),
-        ForeignKey(entity = Platform::class, parentColumns = ["id"], childColumns = ["PlatformId"])
-    ]
-)
-data class GamePlatformJoin(
-    val gameId:Int,
-    val PlatformId:Int
-)
-
-@Entity(
-    tableName = "game_category_join",
-    primaryKeys = ["gameId","categoryId"],
-    foreignKeys = [
-        ForeignKey(entity = Game::class, parentColumns = ["id"],childColumns = ["gameId"] ),
-        ForeignKey(entity = Category::class, parentColumns = ["id"], childColumns = ["categoryId"])
-    ]
-)
-data class GameCategoryJoin(
-    val gameId: Int,
-    val categoryId:Int
 )

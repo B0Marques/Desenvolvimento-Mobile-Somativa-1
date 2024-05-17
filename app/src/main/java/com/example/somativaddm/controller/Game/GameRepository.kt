@@ -17,7 +17,7 @@ class GameRepository @Inject constructor(
     var game:Game? = null
 
     suspend fun getAllGames():List<Game>{
-        return gameDao.getAll()
+        return games
     }
     suspend fun getGameByID(ID:Int):Game?{
         games.forEach {
@@ -99,7 +99,7 @@ class GameRepository @Inject constructor(
             games=gameDao.getAll()
 
         }else{
-            Log.d("GameDebug","Game Alreay Exist")
+
         }
         return game
     }
@@ -140,11 +140,10 @@ class GameRepository @Inject constructor(
             )
 
             gameDao.insert(game!!)
-            Log.d("Insert Game","Game Inserted: ${game!!.id}, ${game!!.title}")
+
             games=gameDao.getAll()
 
         }else{
-            Log.d("GameDebug","Game Alreay Exist")
         }
     }
 

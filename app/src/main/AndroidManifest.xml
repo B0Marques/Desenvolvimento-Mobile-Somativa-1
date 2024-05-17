@@ -21,6 +21,11 @@
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.SomativaDDM" />
         <activity
+            android:name=".controller.Activities.AllGamesActivity"
+            android:exported="false"
+            android:label="AllGamesActivity"
+            android:theme="@style/Theme.SomativaDDM" />
+        <activity
             android:name=".controller.Activities.LoginActivity"
             android:exported="false" />
         <activity

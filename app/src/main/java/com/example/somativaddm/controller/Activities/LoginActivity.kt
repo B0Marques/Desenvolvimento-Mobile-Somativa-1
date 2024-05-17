@@ -46,12 +46,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.example.somativaddm.controller.AppModule
-import com.example.somativaddm.controller.Game.Category
 import com.example.somativaddm.controller.Game.Game
 import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.GameViewModel
-import com.example.somativaddm.controller.Game.Platform
 import com.example.somativaddm.controller.Game.RetrofitInstance
 import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
@@ -86,7 +84,6 @@ class LoginActivity : ComponentActivity() {
             Log.d("Users", text)
         }
         userViewModel.refresh()
-        //gameViewModel.refresh()
 
         userRepository = AppModule().provideRepository(
             AppModule().provideDao(AppModule().provideDatabase(applicationContext))
@@ -118,15 +115,9 @@ class LoginActivity : ComponentActivity() {
 
 
                 coroutineScope.launch {
-                    //val gameTest = gameRepository.getGameByID(999)
 
                     gameRepository.createGamesDatabase()
-                    /*
-                    val games = gameRepository.getAllGames()
-                    games.forEach{
-                        Log.d("GameDebug","Game ${it.id}: ${it.title}")
-                    }
-                    */
+
                 }
 
                 Column(
@@ -146,6 +137,8 @@ class LoginActivity : ComponentActivity() {
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
                             if(Login(login.value,password.value,userRepository)){
                                 Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
+                                val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
+                                startActivity(AllGamesIntent)
                             }
                             else{
                                 Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
@@ -176,29 +169,6 @@ class LoginActivity : ComponentActivity() {
     }
 
 
-    suspend fun addGame(
-        id:Int,
-        title:String,
-        thumb:String,
-        shortDescription:String,
-        gameURL: String,
-        developer:String,
-        releaseDate:String,
-        platform:String,
-        genre:String,
-        repository: GameRepository,
-        coroutineScope: CoroutineScope
-    ):Deferred<Game?>{
-        return coroutineScope.async{
-
-            var game:Game? = null
-            var gameExists:Boolean = false
-
-
-
-            return@async game
-        }
-    }
 }
 fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
     val users = repository.dao.getByName(nickname)
