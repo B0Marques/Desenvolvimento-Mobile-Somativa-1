@@ -17,6 +17,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -44,6 +47,11 @@ android {
     dataBinding {
         enable = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
     buildFeatures{
         dataBinding = true
         viewBinding = true
@@ -52,6 +60,11 @@ android {
 
 dependencies {
 
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     val hiltVersion = "2.50"
 
     implementation("com.google.dagger:hilt-android:$hiltVersion")

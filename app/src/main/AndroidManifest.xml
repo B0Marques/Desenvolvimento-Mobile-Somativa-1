@@ -15,6 +15,11 @@
         android:theme="@style/Theme.SomativaDDM"
         tools:targetApi="31">
         <activity
+            android:name=".controller.GamesActivity"
+            android:exported="false"
+            android:label="@string/title_activity_games"
+            android:theme="@style/Theme.SomativaDDM" />
+        <activity
             android:name=".controller.LoginActivity"
             android:exported="false" />
         <activity
