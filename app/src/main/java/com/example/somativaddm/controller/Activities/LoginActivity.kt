@@ -1,9 +1,8 @@
-package com.example.somativaddm.controller
+package com.example.somativaddm.controller.Activities
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,25 +43,52 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.room.Room
-import com.example.somativaddm.controller.User.Repository.UserDatabase
-import com.example.somativaddm.controller.User.UserDTO
-import com.example.somativaddm.controller.User.UserService
-import kotlinx.coroutines.Dispatchers
+import com.example.somativaddm.controller.AppModule
+import com.example.somativaddm.controller.Game.GameDatabase
+import com.example.somativaddm.controller.Game.GameRepository
+import com.example.somativaddm.controller.Game.GameViewModel
+import com.example.somativaddm.controller.User.Model.UserRepository
+import com.example.somativaddm.controller.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
+    val viewModel: MainViewModel by viewModels()
+
+    val userViewModel: MainViewModel by viewModels()
+    val gameViewModel: GameViewModel by viewModels()
+    @Inject lateinit var gameRepository: GameRepository
+    @Inject lateinit var userRepository: UserRepository
+    @Inject lateinit var gameDatabase: GameDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val db = Room.databaseBuilder(
-            applicationContext,
-            UserDatabase::class.java, "database-user"
-        ).build()
+
+
+        viewModel.refresh()
+        val users = userRepository.users
+        users.forEach{
+            val text = "User: ${it.userName}, password: ${it.password}"
+            Log.d("Users", text)
+        }
+        userViewModel.refresh()
+
+        userRepository = AppModule().provideRepository(
+            AppModule().provideDao(AppModule().provideDatabase(applicationContext))
+        )
+        gameRepository = AppModule().provideGameRepository(AppModule().providesGameDatabase(applicationContext))
+
+        gameViewModel.refresh()
+
+        gameDatabase = AppModule().providesGameDatabase(applicationContext)
+
+
+
+
         setContent{
             Surface {
-
                 var login = remember {
                     mutableStateOf("")
                 }
@@ -69,9 +96,19 @@ class LoginActivity : ComponentActivity() {
                     mutableStateOf("")
                 }
                 val context = LocalContext.current
-                val service = UserService(db,context)
+                //val service = UserService(db,context)
 
                 val coroutineScope = rememberCoroutineScope()
+
+
+                userRepository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
+
+
+                coroutineScope.launch {
+
+                    gameRepository.createGamesDatabase()
+
+                }
 
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -87,22 +124,25 @@ class LoginActivity : ComponentActivity() {
 
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
+                        val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
+                        startActivity(AllGamesIntent)
+                        /*
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
-
-                            coroutineScope.launch {
-                                withContext(Dispatchers.IO){
-                                    try{
-                                        makeLogin().checkLogin(login.value,password.value,service)
-                                    }
-                                    catch (e:Exception){
-                                        Log.w("DEBUG", "LOGIN ERROR")
-                                    }
-                                }
+                            if(Login(login.value,password.value,userRepository)){
+                                Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
+                                val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
+                                startActivity(AllGamesIntent)
                             }
+                            else{
+                                Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
+                            }
+
+
                         }
                         else{
                             Toast.makeText(context,"One of the fields is blank", Toast.LENGTH_SHORT).show()
                         }
+                        */
                     },
                         shape= RoundedCornerShape(5.dp),
                         modifier = Modifier.fillMaxWidth(0.8f)
@@ -110,7 +150,8 @@ class LoginActivity : ComponentActivity() {
                         Text("Login")
                     }
                     Button(onClick = {
-                        service.insertUser("Clebinho","1234")
+                        val intent = Intent(context, RegisterActivity::class.java)
+                        startActivity(intent)
                     },
                         shape= RoundedCornerShape(5.dp),
                         modifier = Modifier.fillMaxWidth(0.5f)
@@ -122,42 +163,23 @@ class LoginActivity : ComponentActivity() {
         }
          
     }
+
+
 }
-
-class makeLogin:ViewModel(){
-
-    public suspend fun checkLogin(username:String, userPassword:String, service: UserService){
-        withContext(Dispatchers.IO) {
-            val user: UserDTO? = service.findByUserName(username)
-            if (user != null) {
-                Log.d("DEBUG", "FIND USER")
-                if (user.password == userPassword) {
-                    Log.d("DEBUG", "Welcome, ${username}")
-
-                } else {
-                    Log.d("DEBUG", "Wrong password")
-                }
-
-            } else {
-
-                Log.d("DEBUG", "CANT FIND USER")
-
-            }
-
+fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
+    val users = repository.dao.getByName(nickname)
+    users.forEach{
+        if(nickname == it.userName && password == it.password){
+             return true
         }
-
     }
+    return false
 }
-
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordField(value:String, onChange: (String) -> Unit,
-               modifier: Modifier = Modifier,
-              ){
+               modifier: Modifier = Modifier,){
 
 
     var passwordVisible by rememberSaveable {
@@ -203,4 +225,7 @@ fun LoginField(value:String, onChange: (String) -> Unit,
         visualTransformation = VisualTransformation.None
         )
 }
+
+
+
 
