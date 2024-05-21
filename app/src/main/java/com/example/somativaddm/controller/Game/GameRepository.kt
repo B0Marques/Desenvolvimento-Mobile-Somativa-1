@@ -23,6 +23,11 @@ class GameRepository @Inject constructor(
     suspend fun getGameByID(ID:Int):Game?{
         return gameDao.getGameById(ID)
     }
+
+    suspend fun getAllGamesOrdered():List<Game>{
+        games = gameDao.getAllGamesOrderedByTitle()
+        return games
+    }
     suspend fun createGamesDatabase(){
         try{
             val response = RetrofitInstance.gameAPI.getAllGames()

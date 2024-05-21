@@ -164,7 +164,7 @@ fun GameList(gameList: List<Game>, context: Context){
 }
 
 private suspend fun loadGameList(gameList:MutableList<Game>, repository:GameRepository){
-        val fetchedGameList = repository.getAllGames()
+        val fetchedGameList = repository.getAllGamesOrdered()
         gameList.clear()
         gameList.addAll(fetchedGameList)
 }
