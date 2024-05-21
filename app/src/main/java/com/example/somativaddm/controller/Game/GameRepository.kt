@@ -16,15 +16,12 @@ class GameRepository @Inject constructor(
     var games = gameDao.getAll()
     var game:Game? = null
 
+    var gameSelected:Game? = null
     suspend fun getAllGames():List<Game>{
         return games
     }
     suspend fun getGameByID(ID:Int):Game?{
-        games.forEach {
-            if(it.id == ID)
-                return it
-        }
-      return null
+        return gameDao.getGameById(ID)
     }
     suspend fun createGamesDatabase(){
         try{
@@ -47,65 +44,9 @@ class GameRepository @Inject constructor(
         gameDao.insert(game)
         games = gameDao.getAll()
     }
-    suspend fun insertGame(
-        id:Int,
-        title: String,
-        thumb: String?,
-        shortDescription: String?,
-        gameURL: String?,
-        developer: String?,
-        releaseDate: String?,
-        platformName: String?,
-        genreName: String?
-    ):Game?{
-        var gameExists = false
-
-        //region nullables
-        var short_description = shortDescription.isNullOrBlank().let { "Value empty in database" }
-        var _thumb = thumb.isNullOrBlank().let { "Value empty in database" }
-        var game_URL = gameURL.isNullOrBlank().let { "Value empty in database" }
-
-        var _developer = developer.isNullOrBlank().let { "Value empty in database" }
-
-        var release_Date = releaseDate.isNullOrBlank().let { "Value empty in database" }
-        var platform = platformName.isNullOrBlank().let { "Value empty in database" }
-        var genre = genreName.isNullOrBlank().let { "Value empty in database" }
-        //endregion
-
-
-        //region check if the game already exist, if does returns null
-
-        games.forEach {
-            if(it.id == id) {
-                gameExists=true
-            }
-        }
-        if(!gameExists) {
-
-
-            game = Game(
-                id = id,
-                title = title,
-                thumbURL = _thumb,
-                shortDescription = short_description,
-                gameURL = game_URL,
-                developer = _developer,
-                releaseDate = release_Date,
-                platform = platform,
-                genre = genre
-            )
-
-            gameDao.insert(game!!)
-            games=gameDao.getAll()
-
-        }else{
-
-        }
-        return game
-    }
 
     suspend fun insertGameByTemporary(temporaryGame: TemporaryGame){
-        var gameExists = false
+
 
         //region nullables
         var thumb = temporaryGame.thumbnail
@@ -114,50 +55,44 @@ class GameRepository @Inject constructor(
         var short_description = temporaryGame.short_description
         if(short_description.isNullOrBlank()) short_description = "No Value"
 
-        //endregion
+        game = Game(
+            id = temporaryGame.id!!,
+            title = temporaryGame.title!!,
+            thumbURL = temporaryGame.thumbnail!!,
+            shortDescription = temporaryGame.short_description!!,
+            gameURL = temporaryGame.game_url!!,
+            developer = temporaryGame.developer!!,
+            releaseDate = temporaryGame.release_date!!,
+            platform = temporaryGame.platform!!,
+            genre = temporaryGame.genre!!
+        )
 
+        gameDao.insert(game!!)
 
-        //region check if the game already exist, if does returns null
-
-        games.forEach {
-            if(it.id == temporaryGame.id) {
-                gameExists=true
-            }
-        }
-        if(!gameExists) {
-
-
-            game = Game(
-                id = temporaryGame.id!!,
-                title = temporaryGame.title!!,
-                thumbURL = temporaryGame.thumbnail!!,
-                shortDescription = temporaryGame.short_description!!,
-                gameURL = temporaryGame.game_url!!,
-                developer = temporaryGame.developer!!,
-                releaseDate = temporaryGame.release_date!!,
-                platform = temporaryGame.platform!!,
-                genre = temporaryGame.genre!!
-            )
-
-            gameDao.insert(game!!)
-
-            games=gameDao.getAll()
-
-        }else{
-        }
+        games=gameDao.getAll()
     }
 
     suspend fun parseMultipleGamesJson(json:String){
             try {
                 val gameListType = object : TypeToken<List<TemporaryGame>>() {}.type
                 val gameList: List<TemporaryGame> = Gson().fromJson(json, gameListType)
-                gameList.forEach { insertGameByTemporary(it)}
+
+                gameList.forEach {
+                        if(!gameAlreadyExist(it.id!!))
+                            insertGameByTemporary(it)
+                    else
+                        Log.d("Parse_Debug", "Game ${it.id}, already exist: ${it.title}")
+                }
 
 
             }
             catch (e:Exception){
                 Log.e("Json Parsin Error", "Error parsing JSON",e)
             }
+    }
+
+    suspend fun gameAlreadyExist(id:Int):Boolean{
+        return gameDao.getGameById(id) != null
     }
 
 

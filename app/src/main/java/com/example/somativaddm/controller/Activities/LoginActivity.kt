@@ -3,7 +3,6 @@ package com.example.somativaddm.controller.Activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -44,22 +43,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import com.example.somativaddm.controller.AppModule
-import com.example.somativaddm.controller.Game.Game
 import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.GameViewModel
-import com.example.somativaddm.controller.Game.RetrofitInstance
-import com.example.somativaddm.controller.User.Model.User
 import com.example.somativaddm.controller.User.Model.UserRepository
 import com.example.somativaddm.controller.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -134,6 +124,9 @@ class LoginActivity : ComponentActivity() {
 
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
+                        val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
+                        startActivity(AllGamesIntent)
+                        /*
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
                             if(Login(login.value,password.value,userRepository)){
                                 Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
@@ -143,10 +136,13 @@ class LoginActivity : ComponentActivity() {
                             else{
                                 Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
                             }
+
+
                         }
                         else{
                             Toast.makeText(context,"One of the fields is blank", Toast.LENGTH_SHORT).show()
                         }
+                        */
                     },
                         shape= RoundedCornerShape(5.dp),
                         modifier = Modifier.fillMaxWidth(0.8f)

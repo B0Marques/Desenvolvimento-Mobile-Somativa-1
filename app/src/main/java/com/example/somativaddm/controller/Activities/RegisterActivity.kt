@@ -105,7 +105,7 @@ class RegisterActivity :  ComponentActivity() {
                         Spacer(modifier = Modifier.height(2.dp))
                         Button(
                             onClick = {
-                                if(CheckCredentials(login.value,password.value,confirmPassword.value,repository,context)){
+                                if(checkCredentials(login.value,password.value,confirmPassword.value,repository,context)){
                                     val intent = Intent(context, LoginActivity::class.java)
                                     startActivity(intent)
                                 }
@@ -144,10 +144,12 @@ class RegisterActivity :  ComponentActivity() {
     }
 }
 
-fun CheckCredentials(name:String, password:String, confirmPassword:String, repository: UserRepository,context:Context):Boolean{
+fun checkCredentials(name:String, password:String, confirmPassword:String, repository: UserRepository,context:Context):Boolean{
     if (name.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
         Toast.makeText(
             context,
+
+
             "One of the fields is blank",
             Toast.LENGTH_SHORT
         ).show()

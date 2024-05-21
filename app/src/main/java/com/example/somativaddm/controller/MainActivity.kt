@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.somativaddm.R
 import com.example.somativaddm.controller.Activities.AllGamesActivity
@@ -37,9 +38,8 @@ class MainActivity : AppCompatActivity() {
             GridLayoutManager(this, 2)
 
 
-
         //val intent = Intent(this, LoginActivity::class.java)
-        val intent = Intent(this, AllGamesActivity::class.java)
+        val intent = Intent(this, LoginActivity::class.java)
         /*
         val db = AppModule().providesGameDatabase(applicationContext)
         db.clearAllTables()

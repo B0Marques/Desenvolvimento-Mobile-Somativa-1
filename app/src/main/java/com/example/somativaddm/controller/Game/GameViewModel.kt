@@ -22,9 +22,6 @@ class GameViewModel @Inject constructor(
         }
 
     }
-
-
-
     fun refresh(){
         viewModelScope.launch (Dispatchers.IO){
             //allGamesLiveData.value = repository.getAllGames()
