@@ -3,6 +3,7 @@ package com.example.somativaddm.controller.Activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.somativaddm.controller.AppModule
@@ -96,20 +99,14 @@ class LoginActivity : ComponentActivity() {
                     mutableStateOf("")
                 }
                 val context = LocalContext.current
-                //val service = UserService(db,context)
 
                 val coroutineScope = rememberCoroutineScope()
-
-
                 userRepository = AppModule().provideRepository(AppModule().provideDao(AppModule().provideDatabase(context)))
-
-
                 coroutineScope.launch {
 
                     gameRepository.createGamesDatabase()
 
                 }
-
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,6 +114,12 @@ class LoginActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(horizontal = 30.dp)
                     ) {
+
+                    Text(text = "VAPOR",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold)
+
+                    Spacer(modifier = Modifier.height(2.dp))
                     LoginField(value = login.value, onChange = {login.value = it},
                         modifier = Modifier.fillMaxWidth())
                     PasswordField(value = password.value, onChange = {password.value = it},
@@ -124,14 +127,11 @@ class LoginActivity : ComponentActivity() {
 
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
-                        val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
-                        startActivity(AllGamesIntent)
-                        /*
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
                             if(Login(login.value,password.value,userRepository)){
                                 Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
-                                val AllGamesIntent = Intent(context, AllGamesActivity::class.java)
-                                startActivity(AllGamesIntent)
+                                val allGamesIntent = Intent(context, AllGamesActivity::class.java)
+                                startActivity(allGamesIntent)
                             }
                             else{
                                 Toast.makeText(context,"Login invalid", Toast.LENGTH_SHORT).show()
@@ -142,7 +142,7 @@ class LoginActivity : ComponentActivity() {
                         else{
                             Toast.makeText(context,"One of the fields is blank", Toast.LENGTH_SHORT).show()
                         }
-                        */
+
                     },
                         shape= RoundedCornerShape(5.dp),
                         modifier = Modifier.fillMaxWidth(0.8f)
@@ -185,7 +185,7 @@ fun PasswordField(value:String, onChange: (String) -> Unit,
     var passwordVisible by rememberSaveable {
         mutableStateOf(false)
     }
-    Spacer(modifier = Modifier.height(40.dp))
+    Spacer(modifier = Modifier.height(5.dp))
 
 
     TextField(value = value, onValueChange = onChange,
@@ -210,13 +210,12 @@ fun PasswordField(value:String, onChange: (String) -> Unit,
 
 @Composable
 fun LoginField(value:String, onChange: (String) -> Unit,
-               modifier: Modifier = Modifier){
+               modifier: Modifier ){
     val focusManager = LocalFocusManager.current
 
 
     TextField(value = value,
         onValueChange = onChange,
-        modifier = modifier,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down)}),
         placeholder = { Text(text = "User Name")},

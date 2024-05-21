@@ -38,18 +38,7 @@ class MainActivity : AppCompatActivity() {
             GridLayoutManager(this, 2)
 
 
-        //val intent = Intent(this, LoginActivity::class.java)
         val intent = Intent(this, LoginActivity::class.java)
-        /*
-        val db = AppModule().providesGameDatabase(applicationContext)
-        db.clearAllTables()
-            val isDatabaseEmpty = isDatabaseEmpty(db)
-                if(isDatabaseEmpty)
-                    Log.d("DATABASE", "IS EMPTY")
-                else
-                    Log.d("DATABASE", "IS NOT EMPTY")
-
-         */
 
         startActivity(intent)
 
