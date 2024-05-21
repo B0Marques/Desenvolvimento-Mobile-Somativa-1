@@ -14,7 +14,7 @@ class FreeToGamesClient {
 
         val api = retrofit.create(FreeToGameAPI::class.java)
 
-        suspend fun getFreeGames(id: Int, category: String, platform: String, sortBy: String) =
+        suspend fun getFreeGames(id: Int? = null, category: String? = null, platform: String? = null, sortBy: String? = null) =
             api.getFreeGames(id, platform, category, sortBy)
 
 
