@@ -1,29 +1,14 @@
-package com.example.somativaddm.controller
+package com.example.somativaddm.controller.Activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.somativaddm.R
-import com.example.somativaddm.controller.Activities.AllGamesActivity
-import com.example.somativaddm.controller.Activities.LoginActivity
+import com.example.somativaddm.controller.AppModule
 import com.example.somativaddm.controller.Game.GameDatabase
-import com.example.somativaddm.controller.Game.GameRepository
-import com.example.somativaddm.controller.Game.GameViewModel
-import com.example.somativaddm.controller.User.Model.UserRepository
-import com.example.somativaddm.controller.viewmodel.MainViewModel
 import com.example.somativaddm.databinding.ActivityMainBinding
-import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding

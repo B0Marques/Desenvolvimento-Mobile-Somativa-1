@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -53,6 +54,9 @@ import com.example.somativaddm.controller.AppModule
 import com.example.somativaddm.controller.Game.Game
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.Singleton
+import com.example.somativaddm.controller.ui.theme.Pink40
+import com.example.somativaddm.controller.ui.theme.Purple80
+import com.example.somativaddm.controller.ui.theme.PurpleGrey80
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -64,23 +68,25 @@ class AllGamesActivity : ComponentActivity() {
         val repository = AppModule().provideGameRepository(AppModule().providesGameDatabase(applicationContext))
 
         setContent{
-            Column( verticalArrangement = Arrangement.SpaceBetween) {
-                val coroutineScope = rememberCoroutineScope()
-                val gameList by remember{ mutableStateOf(mutableListOf<Game>()) }
-                var isLoading by remember {
-                    mutableStateOf(true)
-                }
-                val launch = coroutineScope.launch {
-                    loadGameList(gameList, repository)
-                    isLoading = false
-                }
-                if(isLoading)
-                    LoadingScreen()
-                else
-                    GameList(gameList = gameList, context = LocalContext.current)
+            Surface(color = PurpleGrey80) {
+                Column( verticalArrangement = Arrangement.SpaceBetween) {
+                    val coroutineScope = rememberCoroutineScope()
+                    val gameList by remember{ mutableStateOf(mutableListOf<Game>()) }
+                    var isLoading by remember {
+                        mutableStateOf(true)
+                    }
+                    val launch = coroutineScope.launch {
+                        loadGameList(gameList, repository)
+                        isLoading = false
+                    }
+                    if(isLoading)
+                        LoadingScreen()
+                    else
+                        GameList(gameList = gameList, context = LocalContext.current)
 
-                //val gameList = createSampleGameList(25)
+                    //val gameList = createSampleGameList(25)
 
+                }
             }
         }
     }
@@ -93,7 +99,7 @@ fun GameCard(game: Game, context:Context){
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .combinedClickable (
+            .combinedClickable(
                 onClick = {
                     isExpanded = !isExpanded
                 },
@@ -105,7 +111,8 @@ fun GameCard(game: Game, context:Context){
                 }
             ),
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        colors = CardColors(Purple80, Pink40,Color.Gray,Color.Gray)
 
     ) {
         Column(modifier = Modifier.padding(16.dp),

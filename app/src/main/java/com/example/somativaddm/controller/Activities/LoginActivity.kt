@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,17 +42,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.somativaddm.controller.AppModule
+import com.example.somativaddm.controller.Game.Game
 import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.GameViewModel
 import com.example.somativaddm.controller.User.Model.UserRepository
+import com.example.somativaddm.controller.ui.theme.Pink40
+import com.example.somativaddm.controller.ui.theme.PurpleGrey80
 import com.example.somativaddm.controller.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -91,7 +101,7 @@ class LoginActivity : ComponentActivity() {
 
 
         setContent{
-            Surface {
+            Surface(color = PurpleGrey80){
                 var login = remember {
                     mutableStateOf("")
                 }
@@ -114,7 +124,7 @@ class LoginActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(horizontal = 30.dp)
                     ) {
-
+                    Image(url = "https://cdn.drawception.com/images/panels/2012/3-30/aKN7skjXcp-2.png")
                     Text(text = "VAPOR",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold)
@@ -224,7 +234,17 @@ fun LoginField(value:String, onChange: (String) -> Unit,
         visualTransformation = VisualTransformation.None
         )
 }
-
+@Composable
+private fun Image(url:String) {
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .padding(8.dp)
+            .size(250.dp)
+            .clip(RoundedCornerShape(corner = CornerSize(16.dp))))
+}
 
 
 
