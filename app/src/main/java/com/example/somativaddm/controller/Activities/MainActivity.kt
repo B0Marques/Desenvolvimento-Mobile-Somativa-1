@@ -6,16 +6,14 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.somativaddm.R
-import com.example.somativaddm.controller.AppModule
-import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView<ActivityMainBinding>(
+        binding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
 
@@ -28,10 +26,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
         }
-       fun isDatabaseEmpty(db:GameDatabase):Boolean{
-           val gameCount = AppModule().provideGameDao(db).getAll()
-           return gameCount.isEmpty()
-       }
+
 
     }
 

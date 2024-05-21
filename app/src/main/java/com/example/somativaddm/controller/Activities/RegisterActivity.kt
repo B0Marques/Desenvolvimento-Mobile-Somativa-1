@@ -52,7 +52,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterActivity :  ComponentActivity() {
-    val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
     @Inject lateinit var repository:UserRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +62,13 @@ class RegisterActivity :  ComponentActivity() {
         setContent {
             Surface(color = Color.LightGray
                 ) {
-                var login = remember{
+                val login = remember{
                     mutableStateOf("")
                 }
-                var password = remember {
+                val password = remember {
                     mutableStateOf("")
                 }
-                var confirmPassword = remember{
+                val confirmPassword = remember{
                     mutableStateOf("")
                 }
 
@@ -158,7 +158,7 @@ fun checkCredentials(name:String, password:String, confirmPassword:String, repos
     if(password != confirmPassword){
         Toast.makeText(
             context,
-            "Passwords dont match",
+            "Passwords don't match",
             Toast.LENGTH_SHORT
         ).show()
         return false
@@ -176,7 +176,7 @@ fun checkCredentials(name:String, password:String, confirmPassword:String, repos
     repository.add(User(users.size+1, userName = name, password = password))
     Toast.makeText(
         context,
-        "User cadastred",
+        "User Inserted",
         Toast.LENGTH_SHORT
     ).show()
     return true

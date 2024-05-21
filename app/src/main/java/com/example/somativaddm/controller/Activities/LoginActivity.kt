@@ -30,7 +30,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,22 +43,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.somativaddm.controller.AppModule
-import com.example.somativaddm.controller.Game.Game
 import com.example.somativaddm.controller.Game.GameDatabase
 import com.example.somativaddm.controller.Game.GameRepository
 import com.example.somativaddm.controller.Game.GameViewModel
 import com.example.somativaddm.controller.User.Model.UserRepository
-import com.example.somativaddm.controller.ui.theme.Pink40
 import com.example.somativaddm.controller.ui.theme.PurpleGrey80
 import com.example.somativaddm.controller.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,10 +63,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
-    val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
-    val userViewModel: MainViewModel by viewModels()
-    val gameViewModel: GameViewModel by viewModels()
+    private val userViewModel: MainViewModel by viewModels()
+    private val gameViewModel: GameViewModel by viewModels()
     @Inject lateinit var gameRepository: GameRepository
     @Inject lateinit var userRepository: UserRepository
     @Inject lateinit var gameDatabase: GameDatabase
@@ -102,10 +97,10 @@ class LoginActivity : ComponentActivity() {
 
         setContent{
             Surface(color = PurpleGrey80){
-                var login = remember {
+                val login = remember {
                     mutableStateOf("")
                 }
-                var password = remember{
+                val password = remember{
                     mutableStateOf("")
                 }
                 val context = LocalContext.current
@@ -124,21 +119,19 @@ class LoginActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(horizontal = 30.dp)
                     ) {
-                    Image(url = "https://cdn.drawception.com/images/panels/2012/3-30/aKN7skjXcp-2.png")
+                    logoImage()
                     Text(text = "VAPOR",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold)
 
                     Spacer(modifier = Modifier.height(2.dp))
-                    LoginField(value = login.value, onChange = {login.value = it},
-                        modifier = Modifier.fillMaxWidth())
-                    PasswordField(value = password.value, onChange = {password.value = it},
-                        modifier = Modifier.fillMaxWidth())
+                    LoginField(value = login.value, onChange = {login.value = it} )
+                    PasswordField(value = password.value, onChange = {password.value = it})
 
                     Spacer(modifier = Modifier.height(2.dp))
                     Button(onClick = {
                         if(login.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            if(Login(login.value,password.value,userRepository)){
+                            if(login(login.value,password.value,userRepository)){
                                 Toast.makeText(context,"Welcome ${login.value}", Toast.LENGTH_SHORT).show()
                                 val allGamesIntent = Intent(context, AllGamesActivity::class.java)
                                 startActivity(allGamesIntent)
@@ -176,7 +169,7 @@ class LoginActivity : ComponentActivity() {
 
 
 }
-fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
+fun login(nickname:String, password:String, repository: UserRepository):Boolean{
     val users = repository.dao.getByName(nickname)
     users.forEach{
         if(nickname == it.userName && password == it.password){
@@ -186,10 +179,8 @@ fun Login(nickname:String, password:String, repository: UserRepository):Boolean{
     return false
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordField(value:String, onChange: (String) -> Unit,
-               modifier: Modifier = Modifier,){
+fun PasswordField(value:String, onChange: (String) -> Unit){
 
 
     var passwordVisible by rememberSaveable {
@@ -219,8 +210,7 @@ fun PasswordField(value:String, onChange: (String) -> Unit,
 }
 
 @Composable
-fun LoginField(value:String, onChange: (String) -> Unit,
-               modifier: Modifier ){
+fun LoginField(value:String, onChange: (String) -> Unit ){
     val focusManager = LocalFocusManager.current
 
 
@@ -235,9 +225,9 @@ fun LoginField(value:String, onChange: (String) -> Unit,
         )
 }
 @Composable
-private fun Image(url:String) {
+private fun logoImage() {
     AsyncImage(
-        model = url,
+        model = "https://cdn.drawception.com/images/panels/2012/3-30/aKN7skjXcp-2.png",
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
